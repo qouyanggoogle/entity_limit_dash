@@ -1,0 +1,11 @@
+{
+   "replace":{
+      "[project-id]":"",
+      "[target-service-account-email]":"",
+      "[dataset]":""
+   },
+   "setvalue":{
+      "partner-id-integer":,
+      "advertiser-ids-integer":[]
+   }
+}

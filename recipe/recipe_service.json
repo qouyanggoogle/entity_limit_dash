@@ -1,0 +1,196 @@
+{
+  "setup": {
+    "id": "[project-id]",
+    "key": "",
+    "timezone": "America/Los_Angeles",
+    "day": [
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+      "Sun"
+    ],
+    "hour": [
+      3
+    ],
+    "auth": {
+      "target_email": "[target-service-account-email]"
+    }
+  },
+  "tasks": [
+    {
+	"dataset":{
+	  "auth": "service",
+	  "dataset": "[dataset]"
+	}
+    },
+    {
+	"google_api": {
+        "api": "displayvideo",
+        "auth": "service",
+        "function": "advertisers.list",
+        "headers": {
+          "developer-token": "",
+          "login-customer-id": ""
+        },
+        "key": "",
+        "kwargs": {
+          "partnerId": ""
+        },
+        "kwargs_remote": {},
+        "results": {
+          "bigquery": {
+            "dataset": "[dataset]",
+            "table": "advertiser_list"
+          }
+        },
+        "version": "v3"
+      }
+    },
+    {
+      "sdf": {
+        "auth": "service",
+        "create_single_day_table": false,
+        "dataset": "[dataset]",
+        "file_types": [
+          "FILE_TYPE_CAMPAIGN",
+          "FILE_TYPE_INSERTION_ORDER",
+          "FILE_TYPE_LINE_ITEM",
+          "FILE_TYPE_AD_GROUP",
+          "FILE_TYPE_AD"
+        ],
+        "filter_type": "FILTER_TYPE_ADVERTISER_ID",
+        "partner_id": "",
+        "read": {
+          "filter_ids": {
+            "single_cell": true,
+            "values": []
+          }
+        },
+        "table_suffix": "",
+        "time_partitioned_table": true,
+        "version": "SDF_VERSION_7"
+      }
+    },
+    {
+      "bigquery": {
+        "auth": "service",
+        "from": {
+          "legacy": false,
+          "query": "SELECT *, COALESCE(Keyword_Targeting_Include_Count+Keyword_Targeting_Exclude_Count+Category_Targeting_Include_Count+Category_Targeting_Exclude_Count+Placement_Targeting_YouTube_Channels_Include_Count+Placement_Targeting_YouTube_Channels_Exclude_Count+Placement_Targeting_YouTube_Videos_Include_Count+Placement_Targeting_YouTube_Videos_Exclude_Count+Placement_Targeting_YouTube_URLs_Include_Count+Placement_Targeting_YouTube_URLs_Exclude_Count+Placement_Targeting_Apps_Include_Count+Placement_Targeting_Apps_Exclude_Count+Placement_Targeting_App_Collections_Include_Count+Placement_Targeting_App_Collections_Exclude_Count+Demographic_Targeting_Gender_Count+Demographic_Targeting_Age_Count+Demographic_Targeting_Household_Income_Count+Demographic_Targeting_Parental_Status_Count+Audience_Targeting_Include_Count+Audience_Targeting_Exclude_Count+Affinity_and_In_Market_Targeting_Include_Count+Affinity_and_In_Market_Targeting_Exclude_Count+Custom_List_Targeting_Count,0) AS total_criteria FROM (  SELECT DISTINCT adgroups.Ad_Group_Id AS Ad_Group_Id,    adgroups.Name AS Ad_Group_Name,    adgroups.Status AS Ad_Group_Status,    lis.Line_Item_Id AS Line_Item_Id,    lis.Name AS Line_Item_Name,    lis.Status AS Line_Item_Status,    lis.Type AS Line_Item_Type,    ios.Io_Id AS Io_Id,    ios.Name AS Io_Name,    ios.Status AS Io_Status,    campaigns.Campaign_Id AS Campaign_Id,    campaigns.Name AS Campaign_Name,    campaigns.Status AS Campaign_Status,    campaigns.Advertiser_Id AS Advertiser_Id,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Keyword_Targeting_Include,\";\")) - 1), 0) AS Keyword_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Keyword_Targeting_Exclude,\";\")) - 1), 0) AS Keyword_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Category_Targeting_Include,\";\")) - 1), 0) AS Category_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Category_Targeting_Exclude,\";\")) - 1), 0) AS Category_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Placement_Targeting_YouTube_Channels_Include,\";\")) - 1), 0) AS Placement_Targeting_YouTube_Channels_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Placement_Targeting_YouTube_Channels_Exclude,\";\")) - 1), 0) AS Placement_Targeting_YouTube_Channels_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Placement_Targeting_YouTube_Videos_Include,\";\")) - 1), 0) AS Placement_Targeting_YouTube_Videos_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Placement_Targeting_YouTube_Videos_Exclude,\";\")) - 1), 0) AS Placement_Targeting_YouTube_Videos_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Placement_Targeting_URLs_Include,\";\")) - 1), 0) AS Placement_Targeting_YouTube_URLs_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Placement_Targeting_URLs_Exclude,\";\")) - 1), 0) AS Placement_Targeting_YouTube_URLs_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Placement_Targeting_Apps_Include,\";\")) - 1), 0) AS Placement_Targeting_Apps_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Placement_Targeting_Apps_Exclude,\";\")) - 1), 0) AS Placement_Targeting_Apps_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Placement_Targeting_App_Collections_Include,\";\")) - 1), 0) AS Placement_Targeting_App_Collections_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Placement_Targeting_App_Collections_Exclude,\";\")) - 1), 0) AS Placement_Targeting_App_Collections_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Demographic_Targeting_Gender,\";\")) - 1), 0) AS Demographic_Targeting_Gender_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Demographic_Targeting_Age,\";\")) - 1), 0) AS Demographic_Targeting_Age_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Demographic_Targeting_Household_Income,\";\")) - 1), 0) AS Demographic_Targeting_Household_Income_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Demographic_Targeting_Parental_Status,\";\")) - 1), 0) AS Demographic_Targeting_Parental_Status_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Audience_Targeting_Include,\";\")) - 1), 0) AS Audience_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Audience_Targeting_Exclude,\";\")) - 1), 0) AS Audience_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Affinity_In_Market_Targeting_Include,\";\")) - 1), 0) AS Affinity_and_In_Market_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Affinity_In_Market_Targeting_Exclude,\";\")) - 1), 0) AS Affinity_and_In_Market_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(adgroups.Custom_List_Targeting,\";\")) - 1), 0) AS Custom_List_Targeting_Count  FROM `[project-id].[dataset].SDF_AdGroups` AS adgroups  JOIN `[project-id].[dataset].SDF_LineItems` AS lis USING(Line_Item_Id)  JOIN `[project-id].[dataset].SDF_InsertionOrders` AS ios USING(Io_Id)  JOIN `[project-id].[dataset].SDF_Campaigns` AS campaigns USING(Campaign_Id)  WHERE adgroups._PARTITIONDATE = DATE_SUB(CURRENT_DATE('America/Los_Angeles'), INTERVAL 0 DAY)    AND lis._PARTITIONDATE = DATE_SUB(CURRENT_DATE('America/Los_Angeles'), INTERVAL 0 DAY)    AND ios._PARTITIONDATE = DATE_SUB(CURRENT_DATE('America/Los_Angeles'), INTERVAL 0 DAY)    AND campaigns._PARTITIONDATE = DATE_SUB(CURRENT_DATE('America/Los_Angeles'), INTERVAL 0 DAY)  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37)"
+        },
+        "to": {
+          "dataset": "[dataset]",
+          "view": "adgroup_criteria_view"
+        }
+      }
+    },
+    {
+      "bigquery": {
+        "auth": "service",
+        "from": {
+          "legacy": false,
+          "query": "SELECT *, COALESCE(Channel_Targeting_Include_Count+Channel_Targeting_Exclude_Count+Site_Targeting_Include_Count+Site_Targeting_Exclude_Count+App_Targeting_Include_Count+App_Targeting_Exclude_Count+App_Collection_Targeting_Include_Count+App_Collection_Targeting_Exclude_Count+Category_Targeting_Include_Count+Category_Targeting_Exclude_Count+Keyword_Targeting_Include_Count+Keyword_Targeting_Exclude_Count+Keyword_List_Targeting_Exclude_Count+Audience_Targeting_Similar_Audiences_Count+Audience_Targeting_Include_Count+Audience_Targeting_Exclude_Count+Affinity_and_In_Market_Targeting_Include_Count+Affinity_and_In_Market_Targeting_Exclude_Count+Custom_List_Targeting_Count+Inventory_Source_Targeting_Authorized_Seller_Options_Count+Inventory_Source_Targeting_Include_Count+Inventory_Source_Targeting_Exclude_Count+Inventory_Source_Targeting_Target_New_Exchanges_Count+Viewability_Targeting_Active_View_Count+Video_Player_Size_Targeting_Count+Demographic_Targeting_Gender_Count+Demographic_Targeting_Age_Count+Demographic_Targeting_Household_Income_Count+Demographic_Targeting_Parental_Status_Count,0) AS total_criteria FROM (  SELECT DISTINCT lis.Line_Item_Id AS Line_Item_Id,    lis.Name AS Line_Item_Name,    lis.Status AS Line_Item_Status,    lis.Type AS Line_Item_Type,    ios.Io_Id AS Io_Id,    ios.Name AS Io_Name,    ios.Status AS Io_Status,    campaigns.Campaign_Id AS Campaign_Id,    campaigns.Name AS Campaign_Name,    campaigns.Status AS Campaign_Status,    campaigns.Advertiser_Id AS Advertiser_Id,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Channel_Targeting_Include,\";\")) - 1), 0) AS Channel_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Channel_Targeting_Exclude,\";\")) - 1), 0) AS Channel_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Site_Targeting_Include,\";\")) - 1), 0) AS Site_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Site_Targeting_Exclude,\";\")) - 1), 0) AS Site_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.App_Targeting_Include,\";\")) - 1), 0) AS App_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.App_Targeting_Exclude,\";\")) - 1), 0) AS App_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.App_Collection_Targeting_Include,\";\")) - 1), 0) AS App_Collection_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.App_Collection_Targeting_Exclude,\";\")) - 1), 0) AS App_Collection_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Category_Targeting_Include,\";\")) - 1), 0) AS Category_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Category_Targeting_Exclude,\";\")) - 1), 0) AS Category_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Keyword_Targeting_Include,\";\")) - 1), 0) AS Keyword_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Keyword_Targeting_Exclude,\";\")) - 1), 0) AS Keyword_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Keyword_List_Targeting_Exclude,\";\")) - 1), 0) AS Keyword_List_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Audience_Targeting_Similar_Audiences,\";\")) - 1), 0) AS Audience_Targeting_Similar_Audiences_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Audience_Targeting_Include,\";\")) - 1), 0) AS Audience_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Audience_Targeting_Exclude,\";\")) - 1), 0) AS Audience_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Affinity_In_Market_Targeting_Include,\";\")) - 1), 0) AS Affinity_and_In_Market_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Affinity_In_Market_Targeting_Exclude,\";\")) - 1), 0) AS Affinity_and_In_Market_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Custom_List_Targeting,\";\")) - 1), 0) AS Custom_List_Targeting_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Inventory_Source_Targeting_Authorized_Seller_Options,\";\")) - 1), 0) AS Inventory_Source_Targeting_Authorized_Seller_Options_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Inventory_Source_Targeting_Include,\";\")) - 1), 0) AS Inventory_Source_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Inventory_Source_Targeting_Exclude,\";\")) - 1), 0) AS Inventory_Source_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Inventory_Source_Targeting_Target_New_Exchanges,\";\")) - 1), 0) AS Inventory_Source_Targeting_Target_New_Exchanges_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Viewability_Targeting_Active_View,\";\")) - 1), 0) AS Viewability_Targeting_Active_View_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Video_Player_Size_Targeting,\";\")) - 1), 0) AS Video_Player_Size_Targeting_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Demographic_Targeting_Gender,\";\")) - 1), 0) AS Demographic_Targeting_Gender_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Demographic_Targeting_Age,\";\")) - 1), 0) AS Demographic_Targeting_Age_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Demographic_Targeting_Household_Income,\";\")) - 1), 0) AS Demographic_Targeting_Household_Income_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Demographic_Targeting_Parental_Status,\";\")) - 1), 0) AS Demographic_Targeting_Parental_Status_Count  FROM `[project-id].[dataset].SDF_LineItems` AS lis  JOIN `[project-id].[dataset].SDF_InsertionOrders` AS ios USING(Io_Id)  JOIN `[project-id].[dataset].SDF_Campaigns` AS campaigns USING(Campaign_Id)  WHERE lis._PARTITIONDATE = DATE_SUB(CURRENT_DATE('America/Los_Angeles'), INTERVAL 0 DAY)    AND ios._PARTITIONDATE = DATE_SUB(CURRENT_DATE('America/Los_Angeles'), INTERVAL 0 DAY)    AND campaigns._PARTITIONDATE = DATE_SUB(CURRENT_DATE('America/Los_Angeles'), INTERVAL 0 DAY)  GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40)"
+        },
+        "to": {
+          "dataset": "[dataset]",
+          "view": "li_adgroup_criteria_view"
+        }
+      }
+    },
+    {
+      "bigquery": {
+        "auth": "service",
+        "from": {
+          "legacy": false,
+          "query": "SELECT *,Geography_Targeting_Include_Count+Geography_Targeting_Exclude_Count+Geography_Regional_Location_List_Targeting_Include_Count+Geography_Regional_Location_List_Targeting_Exclude_Count+Language_Targeting_Include_Count+Language_Targeting_Exclude_Count+Device_Targeting_Include_Count+Device_Targeting_Exclude_Count+Browser_Targeting_Include_Count+Browser_Targeting_Exclude_Count+Digital_Content_Labels_Exclude_Count+Brand_Safety_Sensitivity_Setting_Count+Brand_Safety_Custom_Settings_Count+Third_Party_Verification_Services_Count+Third_Party_Verification_Labels_Count+Daypart_Targeting_Count+Daypart_Targeting_Time_Zone_Count+Environment_Targeting_Count+Position_Targeting_On_Screen_Count+Position_Targeting_Display_Position_In_Content_Count+Position_Targeting_Video_Position_In_Content_Count+Position_Targeting_Audio_Position_In_Content_Count+Connection_Speed_Targeting_Count+Carrier_Targeting_Include_Count+Carrier_Targeting_Exclude_Count+TrueView_Category_Exclusions_Targeting_Count+TrueView_Content_Filter_Count+TrueView_Inventory_Source_Targeting_Count+TrueView_ThirdParty_Viewability_Vendor_Count+TrueView_ThirdParty_Brand_Safety_Vendor_Count AS total_criteria FROM (  SELECT DISTINCT lis.Line_Item_Id AS Line_Item_Id,    lis.Name AS Line_Item_Name,    lis.Status AS Line_Item_Status,    lis.Type AS Line_Item_Type,    ios.Io_Id AS Io_Id,    ios.Name AS Io_Name,    ios.Status AS Io_Status,    campaigns.Campaign_Id AS Campaign_Id,    campaigns.Name AS Campaign_Name,    campaigns.Status AS Campaign_Status,    campaigns.Advertiser_Id AS Advertiser_Id,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Geography_Targeting_Include,\";\")) - 1), 0) AS Geography_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Geography_Targeting_Exclude,\";\")) - 1), 0) AS Geography_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Geography_Regional_Location_List_Targeting_Include,\";\")) - 1), 0) AS Geography_Regional_Location_List_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Geography_Regional_Location_List_Targeting_Exclude,\";\")) - 1), 0) AS Geography_Regional_Location_List_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Language_Targeting_Include,\";\")) - 1), 0) AS Language_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Language_Targeting_Exclude,\";\")) - 1), 0) AS Language_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Device_Targeting_Include,\";\")) - 1), 0) AS Device_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Device_Targeting_Exclude,\";\")) - 1), 0) AS Device_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Browser_Targeting_Include,\";\")) - 1), 0) AS Browser_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Browser_Targeting_Exclude,\";\")) - 1), 0) AS Browser_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Digital_Content_Labels_Exclude,\";\")) - 1), 0) AS Digital_Content_Labels_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Brand_Safety_Sensitivity_Setting,\";\")) - 1), 0) AS Brand_Safety_Sensitivity_Setting_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Brand_Safety_Custom_Settings,\";\")) - 1), 0) AS Brand_Safety_Custom_Settings_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Third_Party_Verification_Services,\";\")) - 1), 0) AS Third_Party_Verification_Services_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Third_Party_Verification_Labels,\";\")) - 1), 0) AS Third_Party_Verification_Labels_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Daypart_Targeting,\";\")) - 1), 0) AS Daypart_Targeting_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Daypart_Targeting_Time_Zone,\";\")) - 1), 0) AS Daypart_Targeting_Time_Zone_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Environment_Targeting,\";\")) - 1), 0) AS Environment_Targeting_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Position_Targeting_On_Screen,\";\")) - 1), 0) AS Position_Targeting_On_Screen_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Position_Targeting_Display_Position_In_Content,\";\")) - 1), 0) AS Position_Targeting_Display_Position_In_Content_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Position_Targeting_Video_Position_In_Content,\";\")) - 1), 0) AS Position_Targeting_Video_Position_In_Content_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Position_Targeting_Audio_Position_In_Content,\";\")) - 1), 0) AS Position_Targeting_Audio_Position_In_Content_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Connection_Speed_Targeting,\";\")) - 1), 0) AS Connection_Speed_Targeting_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Carrier_Targeting_Include,\";\")) - 1), 0) AS Carrier_Targeting_Include_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.Carrier_Targeting_Exclude,\";\")) - 1), 0) AS Carrier_Targeting_Exclude_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.TrueView_Category_Exclusions_Targeting,\";\")) - 1), 0) AS TrueView_Category_Exclusions_Targeting_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.TrueView_Content_Filter,\";\")) - 1), 0) AS TrueView_Content_Filter_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.TrueView_Inventory_Source_Targeting,\";\")) - 1), 0) AS TrueView_Inventory_Source_Targeting_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.TrueView_Third_Party_Viewability_Vendor,\";\")) - 1), 0) AS TrueView_ThirdParty_Viewability_Vendor_Count,    COALESCE((ARRAY_LENGTH(SPLIT(lis.TrueView_Third_Party_Brand_Safety_Vendor,\";\")) - 1), 0) AS TrueView_ThirdParty_Brand_Safety_Vendor_Count  FROM `[project-id].[dataset].SDF_LineItems` AS lis  JOIN `[project-id].[dataset].SDF_InsertionOrders` AS ios USING(Io_Id)  JOIN `[project-id].[dataset].SDF_Campaigns` AS campaigns USING(Campaign_Id)  WHERE lis._PARTITIONDATE = DATE_SUB(CURRENT_DATE('America/Los_Angeles'), INTERVAL 0 DAY)    AND ios._PARTITIONDATE = DATE_SUB(CURRENT_DATE('America/Los_Angeles'), INTERVAL 0 DAY)    AND campaigns._PARTITIONDATE = DATE_SUB(CURRENT_DATE('America/Los_Angeles'), INTERVAL 0 DAY))"
+        },
+        "to": {
+          "dataset": "[dataset]",
+          "view": "li_criteria_view"
+        }
+      }
+    },
+    {
+      "bigquery": {
+        "auth": "service",
+        "from": {
+          "legacy": false,
+          "query": "SELECT Advertiser_Id, Campaign_Name, Campaign_Id, Io_Name, Io_Id, Line_Item_Name, Line_Item_Id, Line_Item_Status, Line_Item_Type, Ad_Group_Id, SUM(total_criteria) AS total_criteria FROM (SELECT Advertiser_Id, Campaign_Name, Campaign_Id, Io_Name, Io_Id, Line_Item_Name, Line_Item_Id, Line_Item_Status, Line_Item_Type, Ad_Group_Id, total_criteria FROM ((SELECT Advertiser_Id, Campaign_Name, Campaign_Id, Io_Name, Io_Id, Line_Item_Name, Line_Item_Id, Line_Item_Status, Line_Item_Type, Ad_Group_Id, SUM(total_criteria) AS total_criteria FROM `[project-id].[dataset].adgroup_criteria_view`  GROUP BY 1,2,3,4,5,6,7,8,9,10 ) UNION ALL ( SELECT Advertiser_Id, Campaign_Name, Campaign_Id, Io_Name, Io_Id, Line_Item_Name, Line_Item_Id, Line_Item_Status, Line_Item_Type, 0 AS Ad_Group_Id, SUM(total_criteria) AS total_criteria FROM `[project-id].[dataset].li_adgroup_criteria_view`    GROUP BY 1,2,3,4,5,6,7,8,9,10)))GROUP BY 1,2,3,4,5,6,7,8,9,10"
+        },
+        "to": {
+          "dataset": "[dataset]",
+          "view": "adgroup_combined_criteria_view"
+        }
+      }
+    },
+    {
+      "bigquery": {
+        "auth": "service",
+        "from": {
+          "legacy": false,
+          "query": "SELECT adv.displayName AS Advertiser_Name, li.Advertiser_Id,  li.Campaign_Name,  li.Campaign_Id,  li.Io_Name,  li.Io_Id,  li.Line_Item_Name,  li.Line_Item_Id,  li.Line_Item_Status,  li.Line_Item_Type,  COALESCE(adg.Ad_Group_Id,0) AS ad_group_id,  COALESCE(SUM(COALESCE(adg.total_criteria,0)+COALESCE(li2.total_criteria,0)),0) AS group1_total_criteria,  COALESCE(SUM(adg.total_criteria),0) AS group1_adgroup_criteria,  COALESCE(SUM(li2.total_criteria),0) AS group1_li_criteria,  COALESCE(SUM(li.total_criteria),0) AS group2_total_criteria FROM `[project-id].[dataset].li_criteria_view` AS li LEFT JOIN `[project-id].[dataset].adgroup_criteria_view` AS adg USING(Line_Item_Id)LEFT JOIN `[project-id].[dataset].li_adgroup_criteria_view` AS li2 USING(Line_Item_Id) LEFT JOIN `[project-id].[dataset].advertiser_list` AS adv ON li.Advertiser_Id = adv.advertiserId GROUP BY 1,2,3,4,5,6,7,8,9,10,11"
+        },
+        "to": {
+          "dataset": "[dataset]",
+          "view": "all_combined_view"
+        }
+      }
+    },
+    {
+      "bigquery": {
+        "auth": "service",
+        "from": {
+          "legacy": false,
+          "query": "SELECT TIMESTAMP_MILLIS(last_modified_time) AS last_update FROM `[project-id].[dataset].__TABLES__` WHERE table_id = \"SDF_AdGroups\""
+        },
+        "to": {
+          "dataset": "[dataset]",
+          "view": "last_update"
+        }
+      }
+    },
+    {
+      "bigquery": {
+        "auth": "service",
+        "from": {
+          "legacy": false,
+          "query": "SELECT *, (Affinity_and_In_Market_Targeting_Exclude_Count + Affinity_and_In_Market_Targeting_Include_Count + Audience_Targeting_Exclude_Count + Audience_Targeting_Include_Count + Custom_List_Targeting_Count) AS Audience_Targeting_Count, (Demographic_Targeting_Age_Count + Demographic_Targeting_Gender_Count + Demographic_Targeting_Household_Income_Count + Demographic_Targeting_Parental_Status_Count) AS Demographic_Targeting_Count, (Category_Targeting_Exclude_Count + Category_Targeting_Include_Count + Keyword_Targeting_Exclude_Count + Keyword_Targeting_Include_Count) AS Keyword_Category_Targeting_Count, (Placement_Targeting_App_Collections_Exclude_Count + Placement_Targeting_App_Collections_Include_Count + Placement_Targeting_Apps_Exclude_Count + Placement_Targeting_Apps_Include_Count + Placement_Targeting_YouTube_Channels_Exclude_Count + Placement_Targeting_YouTube_Channels_Include_Count + Placement_Targeting_YouTube_URLs_Exclude_Count + Placement_Targeting_YouTube_URLs_Include_Count + Placement_Targeting_YouTube_Videos_Exclude_Count + Placement_Targeting_YouTube_Videos_Include_Count) AS Placement_Targeting_Count FROM `[project-id].[dataset].adgroup_criteria_view`"
+        },
+        "to": {
+          "dataset": "[dataset]",
+          "view": "adgroup_criteria_view_v2"
+        }
+      }
+    },
+    {
+      "bigquery": {
+        "auth": "service",
+        "from": {
+          "legacy": false,
+          "query": "SELECT *, (App_Collection_Targeting_Exclude_Count + App_Collection_Targeting_Include_Count + App_Targeting_Exclude_Count + App_Targeting_Include_Count) as App_Targeting_Count, (Audience_Targeting_Exclude_Count + Audience_Targeting_Include_Count + Audience_Targeting_Similar_Audiences_Count + Custom_List_Targeting_Count + Affinity_and_In_Market_Targeting_Exclude_Count + Affinity_and_In_Market_Targeting_Include_Count) as Audience_Targeting_Count, (Channel_Targeting_Exclude_Count + Channel_Targeting_Include_Count) as Channel_Targeting_Count, (Demographic_Targeting_Age_Count + Demographic_Targeting_Gender_Count + Demographic_Targeting_Household_Income_Count + Demographic_Targeting_Parental_Status_Count) as Demographic_Targeting_Count, (Inventory_Source_Targeting_Authorized_Seller_Options_Count + Inventory_Source_Targeting_Exclude_Count + Inventory_Source_Targeting_Include_Count + Inventory_Source_Targeting_Target_New_Exchanges_Count) as Inventory_Source_Targeting_Count, (Category_Targeting_Exclude_Count + Category_Targeting_Include_Count + Keyword_List_Targeting_Exclude_Count + Keyword_Targeting_Exclude_Count + Keyword_Targeting_Include_Count) as Keyword_Category_Criteria_Count, (Site_Targeting_Exclude_Count + Site_Targeting_Include_Count) as Site_Targeting_Count FROM `[project-id].[dataset].li_adgroup_criteria_view`"
+        },
+        "to": {
+          "dataset": "[dataset]",
+          "view": "li_adgroup_criteria_view_v2"
+        }
+      }
+    },
+    {
+      "bigquery": {
+        "auth": "service",
+        "from": {
+          "legacy": false,
+          "query": "SELECT *, (Brand_Safety_Custom_Settings_Count + Brand_Safety_Sensitivity_Setting_Count + Digital_Content_Labels_Exclude_Count + Third_Party_Verification_Labels_Count + Third_Party_Verification_Services_Count) AS Brand_Safety_Targeting_Count, (Browser_Targeting_Exclude_Count + Browser_Targeting_Include_Count) AS Browser_Targeting_Count, (Carrier_Targeting_Exclude_Count + Carrier_Targeting_Include_Count + Connection_Speed_Targeting_Count) AS Carrier_Targeting_Count, (Daypart_Targeting_Count + Daypart_Targeting_Time_Zone_Count) AS Daypart_Targeting_Count_SUM, (Device_Targeting_Exclude_Count + Device_Targeting_Include_Count + Environment_Targeting_Count) AS Device_Targeting_Count, (Geography_Regional_Location_List_Targeting_Exclude_Count + Geography_Regional_Location_List_Targeting_Include_Count + Geography_Targeting_Exclude_Count + Geography_Targeting_Include_Count) AS Geo_Targeting_Count, (Language_Targeting_Exclude_Count + Language_Targeting_Include_Count) AS Language_Targeting_Count, (Position_Targeting_Audio_Position_In_Content_Count + Position_Targeting_Display_Position_In_Content_Count + Position_Targeting_On_Screen_Count + Position_Targeting_Video_Position_In_Content_Count) as Position_Targeting_Count, (TrueView_ThirdParty_Brand_Safety_Vendor_Count + TrueView_ThirdParty_Viewability_Vendor_Count) as TrueView_3P_Vendor_Count FROM `[project-id].[dataset].li_criteria_view`"
+        },
+        "to": {
+          "dataset": "[dataset]",
+          "view": "li_criteria_view_v2"
+        }
+      }
+    }
+  ]
+}
+
