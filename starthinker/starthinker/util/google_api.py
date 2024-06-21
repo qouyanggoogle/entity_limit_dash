@@ -657,7 +657,7 @@ def API_DV360(config, auth, iterate=False):
 
   api = {
       'api': 'displayvideo',
-      'version': 'v1',
+      'version': 'v3',
       'auth': auth,
       'iterate': iterate
   }
